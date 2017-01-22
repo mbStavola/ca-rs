@@ -1,0 +1,11 @@
+[package]
+name = "ca-rs"
+version = "0.1.0"
+authors = ["Matthew Stavola <mstavola9@gmail.com>"]
+
+[dependencies]
+rocket = "0.1.5"
+rocket_codegen = "0.1.5"
+
+ws = "0.5.3"
+redis = "0.8.0"
