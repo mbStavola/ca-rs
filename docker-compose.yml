@@ -1,0 +1,15 @@
+version: '2'
+services:
+  ca-rs-web:
+    build: .
+    env_file: ca-rs.env
+    ports:
+      - '80:8080'
+    links:
+      - ca-rs-redis
+    container_name: ca-rs-running
+  ca-rs-redis:
+    image: 'redis:3.0'
+    expose:
+      - '6379'
+    container_name: ca-rs-redis

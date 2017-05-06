@@ -4,8 +4,8 @@ version = "0.1.0"
 authors = ["Matthew Stavola <mstavola9@gmail.com>"]
 
 [dependencies]
-rocket = "0.1.5"
-rocket_codegen = "0.1.5"
+rocket = "0.2.2"
+rocket_codegen = "0.2.2"
 
-ws = "0.5.3"
+ws = "0.7.1"
 redis = "0.8.0"

@@ -135,4 +135,7 @@ $RECYCLE.BIN/
 # .nfs files are created when an open file is removed but is still being accessed
 .nfs*
 
+# Docker
+ca-rs.env
+
 # End of https://www.gitignore.io/api/rust,intellij,macos,osx,windows,linux
