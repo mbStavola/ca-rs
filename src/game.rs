@@ -82,13 +82,11 @@ impl<'a> Handler for Paused<'a> {
 // Games start off in the inactive state
 impl<'a> Game<Inactive<'a>> {
     pub fn new(players: &'a mut Vec<Player>) -> Self {
-        let game = Game {
+        Game {
             state: Inactive {
                 players: players,
             }
-        };
-
-        game
+        }
     }
 }
 
