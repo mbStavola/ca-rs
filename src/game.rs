@@ -4,24 +4,8 @@ use ws::{Factory, Sender, Handler, Message, Result};
 
 use player::Player;
 
-// We should probably use RefCells so we can borrow the struct and mutate it across threads
-pub struct GameFactory {
-    game: Game
-}
-
-impl Factory for GameFactory {
-    type Handler = Game;
-
-    fn connection_made(&mut self, _: Sender) -> Self::Handler {
-        self.game
-    }
-
-    fn client_connected(&mut self, ws: Sender) -> Self::Handler {
-        self.connection_made(ws)
-    }
-}
-
-struct Game {
+pub struct Game {
+    out: Sender,
     delegate: Box<StateHandler>
 }
 
@@ -36,20 +20,20 @@ impl Handler for Game {
     }
 }
 
-struct Inactive<'a> {
+pub struct Inactive<'a> {
     players: &'a mut Vec<Player>,
 }
 
 trait StateHandler {
-//    fn on_open(&mut self, shake: Handshake) -> Result<Box<StateHandler>>;
+    //    fn on_open(&mut self, shake: Handshake) -> Result<Box<StateHandler>>;
     fn on_message(&mut self, msg: Message) -> Result<Box<StateHandler>>;
-//    fn on_close(&mut self, code: CloseCode, reason: &str) -> Result<Box<StateHandler>>;
+    //    fn on_close(&mut self, code: CloseCode, reason: &str) -> Result<Box<StateHandler>>;
 
-//    #[inline]
-//    fn on_timeout(&mut self, event: Token) -> Result<Box<StateHandler>>;
+    //    #[inline]
+    //    fn on_timeout(&mut self, event: Token) -> Result<Box<StateHandler>>;
 
-//    #[inline]
-//    fn on_new_timeout(&mut self, _: Token, _: Timeout) -> Result<Box<StateHandler>>;
+    //    #[inline]
+    //    fn on_new_timeout(&mut self, _: Token, _: Timeout) -> Result<Box<StateHandler>>;
 }
 
 impl<'a> StateHandler for Inactive<'a> {
@@ -101,21 +85,6 @@ struct Paused<'a> {
 impl<'a> StateHandler for Paused<'a> {
     fn on_message(&mut self, msg: Message) -> Result<Box<StateHandler>> {
         unimplemented!()
-    }
-}
-
-// Games start off in the inactive state
-impl<'a> GameFactory {
-    pub fn new(players: &'a mut Vec<Player>) -> Self {
-        let state = Inactive {
-            players: players,
-        };
-
-        GameFactory {
-            game: Game {
-                delegate: Box::new(state)
-            }
-        }
     }
 }
 

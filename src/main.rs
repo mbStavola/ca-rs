@@ -8,7 +8,8 @@ extern crate redis;
 mod game;
 mod player;
 
-use game::GameFactory;
+use game::{Game, Inactive};
+use player::Player;
 
 use std::env;
 use std::thread;
@@ -38,9 +39,18 @@ fn main() {
         websocket_uri = format!("{}:{}", host, port);
     }
 
-    let players = vec![];
+    let mut players: Vec<Player> = vec![];
     let game_thread = thread::Builder::new().name("game_thread".to_owned()).spawn(move || {
-        ws::listen(websocket_uri.as_str(), GameFactory::new(&mut players)).expect("Could not start websocket server.");
+        ws::listen(websocket_uri.as_str(), |out| {
+            let state = Inactive {
+                players: &mut players
+            };
+
+            Game {
+                out: out,
+                delegate: Box::new(state)
+            }
+        }).expect("Could not start websocket server.");
     }).unwrap();
 
     rocket::ignite().mount("/", routes![index]).launch();
