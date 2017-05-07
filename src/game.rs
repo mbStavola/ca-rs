@@ -5,15 +5,15 @@ use ws::{Factory, Sender, Handler, Message, Result};
 use player::Player;
 
 // We should probably use RefCells so we can borrow the struct and mutate it across threads
-pub struct Game<S: Handler> {
-    state: S
+pub struct GameFactory {
+    game: Game
 }
 
-impl<S: Handler> Factory for Game<S> {
-    type Handler = S;
+impl Factory for GameFactory {
+    type Handler = Game;
 
     fn connection_made(&mut self, _: Sender) -> Self::Handler {
-        self.state
+        self.game
     }
 
     fn client_connected(&mut self, ws: Sender) -> Self::Handler {
@@ -21,21 +21,46 @@ impl<S: Handler> Factory for Game<S> {
     }
 }
 
+struct Game {
+    delegate: Box<StateHandler>
+}
+
+impl Handler for Game {
+    fn on_message(&mut self, msg: Message) -> Result<()> {
+        // Perform action and mutate delegate
+        if let Ok(new_state) = self.delegate.on_message(msg) {
+            self.delegate = new_state;
+        }
+
+        Ok(())
+    }
+}
+
 struct Inactive<'a> {
     players: &'a mut Vec<Player>,
 }
 
-impl<'a> Handler for Inactive<'a> {
-    fn on_message(&mut self, msg: Message) -> Result<()> {
+trait StateHandler {
+//    fn on_open(&mut self, shake: Handshake) -> Result<Box<StateHandler>>;
+    fn on_message(&mut self, msg: Message) -> Result<Box<StateHandler>>;
+//    fn on_close(&mut self, code: CloseCode, reason: &str) -> Result<Box<StateHandler>>;
+
+//    #[inline]
+//    fn on_timeout(&mut self, event: Token) -> Result<Box<StateHandler>>;
+
+//    #[inline]
+//    fn on_new_timeout(&mut self, _: Token, _: Timeout) -> Result<Box<StateHandler>>;
+}
+
+impl<'a> StateHandler for Inactive<'a> {
+    fn on_message(&mut self, msg: Message) -> Result<Box<StateHandler>> {
         if let Ok(text) = msg.as_text() {
             match text {
                 _ => println!("{}", text)
             }
         }
 
-        let new_state: Nominating = Nominating::from(*self);
-
-        Ok(())
+        Ok(Box::new(Nominating::from(*self)))
     }
 }
 
@@ -43,9 +68,9 @@ struct Nominating<'a> {
     players: &'a mut Vec<Player>,
 }
 
-impl<'a> Handler for Nominating<'a> {
-    fn on_message(&mut self, msg: Message) -> Result<()> {
-        Ok(())
+impl<'a> StateHandler for Nominating<'a> {
+    fn on_message(&mut self, msg: Message) -> Result<Box<StateHandler>> {
+        unimplemented!()
     }
 }
 
@@ -53,9 +78,9 @@ struct RoundStart<'a> {
     players: &'a mut Vec<Player>,
 }
 
-impl<'a> Handler for RoundStart<'a> {
-    fn on_message(&mut self, msg: Message) -> Result<()> {
-        Ok(())
+impl<'a> StateHandler for RoundStart<'a> {
+    fn on_message(&mut self, msg: Message) -> Result<Box<StateHandler>> {
+        unimplemented!()
     }
 }
 
@@ -63,9 +88,9 @@ struct RoundEnd<'a> {
     players: &'a mut Vec<Player>,
 }
 
-impl<'a> Handler for RoundEnd<'a> {
-    fn on_message(&mut self, msg: Message) -> Result<()> {
-        Ok(())
+impl<'a> StateHandler for RoundEnd<'a> {
+    fn on_message(&mut self, msg: Message) -> Result<Box<StateHandler>> {
+        unimplemented!()
     }
 }
 
@@ -73,18 +98,22 @@ struct Paused<'a> {
     players: &'a mut Vec<Player>,
 }
 
-impl<'a> Handler for Paused<'a> {
-    fn on_message(&mut self, msg: Message) -> Result<()> {
-        Ok(())
+impl<'a> StateHandler for Paused<'a> {
+    fn on_message(&mut self, msg: Message) -> Result<Box<StateHandler>> {
+        unimplemented!()
     }
 }
 
 // Games start off in the inactive state
-impl<'a> Game<Inactive<'a>> {
+impl<'a> GameFactory {
     pub fn new(players: &'a mut Vec<Player>) -> Self {
-        Game {
-            state: Inactive {
-                players: players,
+        let state = Inactive {
+            players: players,
+        };
+
+        GameFactory {
+            game: Game {
+                delegate: Box::new(state)
             }
         }
     }
