@@ -6,6 +6,7 @@ use player::Player;
 
 pub struct Game {
     out: Sender,
+    players: Vec<Player>,
     delegate: Box<StateHandler>
 }
 
@@ -21,7 +22,7 @@ impl Handler for Game {
 }
 
 pub struct Inactive<'a> {
-    players: &'a mut Vec<Player>,
+    players: &'a Vec<Player>,
 }
 
 trait StateHandler {
@@ -49,7 +50,7 @@ impl<'a> StateHandler for Inactive<'a> {
 }
 
 struct Nominating<'a> {
-    players: &'a mut Vec<Player>,
+    players: &'a Vec<Player>,
 }
 
 impl<'a> StateHandler for Nominating<'a> {
@@ -59,7 +60,7 @@ impl<'a> StateHandler for Nominating<'a> {
 }
 
 struct RoundStart<'a> {
-    players: &'a mut Vec<Player>,
+    players: &'a Vec<Player>,
 }
 
 impl<'a> StateHandler for RoundStart<'a> {
@@ -69,7 +70,7 @@ impl<'a> StateHandler for RoundStart<'a> {
 }
 
 struct RoundEnd<'a> {
-    players: &'a mut Vec<Player>,
+    players: &'a Vec<Player>,
 }
 
 impl<'a> StateHandler for RoundEnd<'a> {
@@ -79,7 +80,7 @@ impl<'a> StateHandler for RoundEnd<'a> {
 }
 
 struct Paused<'a> {
-    players: &'a mut Vec<Player>,
+    players: &'a Vec<Player>,
 }
 
 impl<'a> StateHandler for Paused<'a> {

@@ -39,15 +39,17 @@ fn main() {
         websocket_uri = format!("{}:{}", host, port);
     }
 
-    let mut players: Vec<Player> = vec![];
     let game_thread = thread::Builder::new().name("game_thread".to_owned()).spawn(move || {
         ws::listen(websocket_uri.as_str(), |out| {
+            let mut players: Vec<Player> = vec![];
+
             let state = Inactive {
-                players: &mut players
+                players: &players
             };
 
             Game {
                 out: out,
+                players: players,
                 delegate: Box::new(state)
             }
         }).expect("Could not start websocket server.");
