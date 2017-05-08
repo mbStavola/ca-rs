@@ -12,7 +12,7 @@ mod game;
 mod player;
 mod action;
 
-use game::{Game, GameState};
+use game::{Game, GameState, Config};
 use player::Player;
 
 use std::env;
@@ -33,8 +33,6 @@ fn main() {
         client = redis::Client::open(uri.as_str()).expect("Could not create redis client.");
     }
 
-    let con = client.get_connection().expect("Could not open connection to redis client.");
-
     let websocket_uri: String;
     {
         let host = env::var("WEBSOCKET_HOST").unwrap_or(String::from(""));
@@ -43,9 +41,11 @@ fn main() {
         websocket_uri = format!("{}:{}", host, port);
     }
 
+    let config = Config::new(3, 15, 15);
+
     let game_thread = thread::Builder::new().name("game_thread".to_owned()).spawn(move || {
         ws::listen(websocket_uri.as_str(), |out| {
-            Game::new(out)
+            Game::new(out, &client, &config)
         }).expect("Could not start websocket server.");
     }).unwrap();
 

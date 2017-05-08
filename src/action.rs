@@ -2,9 +2,10 @@ extern crate ws;
 extern crate regex;
 extern crate lazy_static;
 
-use ws::{Message};
+use ws::{Message, Result, Error, ErrorKind};
 use self::regex::Regex;
 
+#[derive(PartialEq)]
 pub enum ClientAction {
     Join,
     Chat(String),
@@ -15,7 +16,7 @@ pub enum ClientAction {
 }
 
 impl ClientAction {
-    pub fn parse(message: Message) -> Result<ClientAction, ()> {
+    pub fn parse(message: Message) -> Result<ClientAction> {
         lazy_static! {
             static ref JOIN_EXP: Regex = Regex::new(r":join:").unwrap();
             static ref CHAT_EXP: Regex = Regex::new(r":chat:(.+)").unwrap();
@@ -23,7 +24,7 @@ impl ClientAction {
             static ref INTE_EXP: Regex = Regex::new(r":inte:(\d+) (ban|unban)").unwrap();
         }
 
-        message.into_text().map_err(|err| ()).and_then(|text| {
+        message.into_text().and_then(|text| {
             let ref_text = text.as_ref();
 
             if JOIN_EXP.is_match(ref_text) {
@@ -46,7 +47,7 @@ impl ClientAction {
                     "subm" => ClientAction::Submission(id),
                     "disc" => ClientAction::Discard(id),
                     "vote" => ClientAction::Vote(id),
-                    _ => return Err(())
+                    _ => return Err(Error::new(ErrorKind::Internal, "Could not parse ClientAction."))
                 };
 
                 return Ok(it);
@@ -61,7 +62,7 @@ impl ClientAction {
                 return Ok(it);
             }
 
-            return Err(())
+            Err(Error::new(ErrorKind::Internal, "Could not parse ClientAction."))
         })
     }
 }
