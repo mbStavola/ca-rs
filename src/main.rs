@@ -12,8 +12,7 @@ mod game;
 mod player;
 mod action;
 
-use game::{Game, GameState, Config};
-use player::Player;
+use game::{Config, Game};
 
 use std::env;
 use std::thread;
@@ -43,7 +42,7 @@ fn main() {
 
     let config = Config::new(3, 15, 15);
 
-    let game_thread = thread::Builder::new().name("game_thread".to_owned()).spawn(move || {
+    let _ = thread::Builder::new().name("game_thread".to_owned()).spawn(move || {
         ws::listen(websocket_uri.as_str(), |out| {
             Game::new(out, &client, &config)
         }).expect("Could not start websocket server.");

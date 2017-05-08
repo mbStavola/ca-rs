@@ -63,7 +63,7 @@ impl <'a> Handler for Game<'a> {
         }
 
         // Broadcast game state to client
-        self.out.broadcast(Message::text("AH"));
+        self.out.broadcast(Message::text("AH"))?;
 
         Ok(())
     }
