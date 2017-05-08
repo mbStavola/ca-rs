@@ -4,11 +4,11 @@ pub struct Player {
 
 // States
 enum PlayerState {
-    WATCHING,
-    PLAYING,
-    JUDGING,
-    TIMEOUT,
-    BANNED,
+    Watching,
+    Playing,
+    Judging,
+    TimeOut,
+    Banned,
 }
 
 // Transitions

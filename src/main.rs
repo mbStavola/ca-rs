@@ -1,14 +1,18 @@
 #![feature(plugin)]
 #![plugin(rocket_codegen)]
 
+#[macro_use]
+extern crate lazy_static;
+
 extern crate rocket;
 extern crate ws;
 extern crate redis;
 
 mod game;
 mod player;
+mod action;
 
-use game::{Game, Inactive};
+use game::{Game, GameState};
 use player::Player;
 
 use std::env;
@@ -41,17 +45,7 @@ fn main() {
 
     let game_thread = thread::Builder::new().name("game_thread".to_owned()).spawn(move || {
         ws::listen(websocket_uri.as_str(), |out| {
-            let mut players: Vec<Player> = vec![];
-
-            let state = Inactive {
-                players: &players
-            };
-
-            Game {
-                out: out,
-                players: players,
-                delegate: Box::new(state)
-            }
+            Game::new(out)
         }).expect("Could not start websocket server.");
     }).unwrap();
 

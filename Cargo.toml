@@ -9,3 +9,6 @@ rocket_codegen = "0.2.2"
 
 ws = "0.7.1"
 redis = "0.8.0"
+
+regex = "0.2.1"
+lazy_static = "0.2.8"
