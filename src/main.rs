@@ -18,7 +18,7 @@ mod game;
 mod player;
 mod action;
 
-use game::{Config, Game};
+use game::{Config, Game, SharedGameState, SharedPlayerList};
 
 use std::env;
 use std::thread;
@@ -48,9 +48,19 @@ fn main() {
 
     let config = Config::new(3, 15, 15);
 
+    let state = SharedGameState::new();
+
+    let watching = SharedPlayerList::new();
+    let playing = SharedPlayerList::new();
+
     let _ = thread::Builder::new().name("game_thread".to_owned()).spawn(move || {
         ws::listen(websocket_uri.as_str(), |out| {
-            Game::new(out, &client, &config)
+            let state = state.clone();
+
+            let watching = watching.clone();
+            let playing = playing.clone();
+
+            Game::new(out, &client, &config, state, watching, playing)
         }).expect("Could not start websocket server.");
     }).unwrap();
 
