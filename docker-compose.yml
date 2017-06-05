@@ -1,15 +1,21 @@
-version: '2'
+version: '3.1'
 services:
   ca-rs-web:
     build: .
+    container_name: ca-rs-web
+    depends_on: ca-rs-redis
     env_file: ca-rs.env
     ports:
       - '80:8080'
-    links:
-      - ca-rs-redis
-    container_name: ca-rs-running
+    networks:
+      - backend
   ca-rs-redis:
     image: 'redis:3.0'
+    container_name: ca-rs-redis
     expose:
       - '6379'
-    container_name: ca-rs-redis
+    networks:
+      - backend
+networks:
+  backend:
+    driver: bridge

@@ -121,12 +121,12 @@ impl<'a> Handler for Game<'a> {
         if let Ok(action) = ClientAction::parse(&msg) {
             let redis_conn = self.client.get_connection().expect("Could not make redis connection");
 
-            let mut watching_guard: MutexGuard<Vec<Player>> = match self.watching.as_ref().lock() {
+            let watching_guard: MutexGuard<Vec<Player>> = match self.watching.as_ref().lock() {
                 Ok(guard) => guard,
                 Err(poison) => poison.into_inner()
             };
 
-            let mut playing_guard: MutexGuard<Vec<Player>> = match self.playing.as_ref().lock() {
+            let playing_guard: MutexGuard<Vec<Player>> = match self.playing.as_ref().lock() {
                 Ok(guard) => guard,
                 Err(poison) => poison.into_inner()
             };
@@ -134,18 +134,18 @@ impl<'a> Handler for Game<'a> {
             if let ClientAction::Register { name } = action {
                 let name_exists = (*playing_guard).iter()
                     .chain((*watching_guard).iter())
-                    .find(|item| {
+                    .any(|item| {
                         if let Some(ref other_name) = item.name {
                             return &name == other_name;
                         }
 
                         false
-                    }).is_some();
+                    });
 
                 if !name_exists {
                     let mut taken_player = self.player.take().unwrap();
 
-                    let current_name = taken_player.name.unwrap_or("Anonymous".to_string());
+                    let current_name = taken_player.name.unwrap_or_else(|| "Anonymous".to_string());
                     let name_change = format!("{} is now known as {}.", current_name, name);
 
                     taken_player.name = Some(name);
@@ -210,7 +210,7 @@ impl<'a> Handler for Game<'a> {
                         Err(poison) => poison.into_inner()
                     };
 
-                    watching_guard.retain(|ref watching_player| {
+                    watching_guard.retain(|watching_player| {
                         watching_player.addr != player.addr
                     })
                 }
@@ -220,7 +220,7 @@ impl<'a> Handler for Game<'a> {
                         Err(poison) => poison.into_inner()
                     };
 
-                    playing_guard.retain(|ref playing_player| {
+                    playing_guard.retain(|playing_player| {
                         playing_player.addr != player.addr
                     })
                 }

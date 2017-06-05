@@ -1,0 +1,33 @@
+{
+  "name": "ca-rs",
+  "version": "0.1.0",
+  "description": "A [Cards Against Humanity](http://cardsagainsthumanity.com/) clone written in Rust.",
+  "main": "index.js",
+  "scripts": {
+    "build": "webpack"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mbStavola/ca-rs.git"
+  },
+  "keywords": [],
+  "author": "Matt Stavola",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mbStavola/ca-rs/issues"
+  },
+  "homepage": "https://github.com/mbStavola/ca-rs#readme",
+  "devDependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-core": "^6.24.1",
+    "babel-loader": "^7.0.0",
+    "babel-polyfill": "^6.23.0",
+    "babel-preset-env": "^1.5.1",
+    "webpack": "^2.6.1"
+  },
+  "dependencies": {
+    "chassis": "0.0.7",
+    "moment": "^2.18.1",
+    "sockjs": "^0.3.18"
+  }
+}

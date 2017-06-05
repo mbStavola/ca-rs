@@ -1,9 +1,8 @@
 extern crate serde_redis;
 
-use self::serde_redis::RedisDeserialize;
-
 #[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct Player {
+    #[serde(skip_serializing)]
     pub addr: String,
     pub name: Option<String>,
     pub state: PlayerState

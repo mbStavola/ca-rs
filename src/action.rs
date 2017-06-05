@@ -1,10 +1,7 @@
 extern crate ws;
-extern crate regex;
-extern crate lazy_static;
 extern crate serde_json;
 
 use ws::{Message, Result, Error, ErrorKind};
-use self::regex::Regex;
 
 #[derive(Debug, Deserialize, PartialEq)]
 pub enum ClientAction {

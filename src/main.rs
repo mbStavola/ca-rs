@@ -2,9 +2,6 @@
 #![plugin(rocket_codegen)]
 
 #[macro_use]
-extern crate lazy_static;
-
-#[macro_use]
 extern crate log;
 
 #[macro_use]
@@ -31,8 +28,8 @@ fn index() -> &'static str {
 fn main() {
     let client: redis::Client;
     {
-        let host = env::var("REDIS_HOST").unwrap_or(String::from("ca-rs-redis"));
-        let port = env::var("REDIS_PORT").unwrap_or(String::from("6379"));
+        let host = env::var("REDIS_HOST").unwrap_or_else(|_| String::from("ca-rs-redis"));
+        let port = env::var("REDIS_PORT").unwrap_or_else(|_| String::from("6379"));
 
         let uri = format!("redis://{}:{}", host, port);
         client = redis::Client::open(uri.as_str()).expect("Could not create redis client.");
@@ -40,8 +37,8 @@ fn main() {
 
     let websocket_uri: String;
     {
-        let host = env::var("WEBSOCKET_HOST").unwrap_or(String::from(""));
-        let port = env::var("WEBSOCKET_PORT").unwrap_or(String::from(""));
+        let host = env::var("WEBSOCKET_HOST").unwrap_or_else(|_| String::from(""));
+        let port = env::var("WEBSOCKET_PORT").unwrap_or_else(|_| String::from(""));
 
         websocket_uri = format!("{}:{}", host, port);
     }
