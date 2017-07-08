@@ -3,6 +3,7 @@ extern crate serde_json;
 
 use ws::{Message, Result, Error, ErrorKind};
 
+#[serde(tag = "type")]
 #[derive(Debug, Deserialize, PartialEq)]
 pub enum ClientAction {
     Join,
@@ -25,7 +26,8 @@ impl ClientAction {
     pub fn parse(message: &Message) -> Result<ClientAction> {
         message.as_text().and_then(|text| {
             serde_json::from_str(text).map_err(|e| {
-                Error::new(ErrorKind::Internal, "Could not parse ClientAction.")
+                let error = format!("Could not parse ClientAction: {}", text);
+                Error::new(ErrorKind::Internal, error)
             })
         })
     }

@@ -1,0 +1,11 @@
+[development]
+address = "localhost"
+port = 8000
+template_dir = "src/frontend/templates"
+log = "normal"
+
+[production]
+address = "0.0.0.0"
+port = 80
+template_dir = "dev_templates/"
+log = "critical"

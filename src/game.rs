@@ -119,6 +119,16 @@ impl<'a> Handler for Game<'a> {
 
     fn on_message(&mut self, msg: Message) -> ws::Result<()> {
         if let Ok(action) = ClientAction::parse(&msg) {
+            if let ClientAction::Chat { message } = action {
+                let taken_player = self.player.as_ref().unwrap();
+                let name = taken_player.clone().name.unwrap_or_else(|| "Anonymous".to_string());
+
+                let say = format!("{}: {}", name, message);
+
+                self.out.broadcast(Message::text(say));
+                return Ok(());
+            }
+
             let redis_conn = self.client.get_connection().expect("Could not make redis connection");
 
             let watching_guard: MutexGuard<Vec<Player>> = match self.watching.as_ref().lock() {

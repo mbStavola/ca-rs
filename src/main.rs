@@ -8,6 +8,7 @@ extern crate log;
 extern crate serde_derive;
 
 extern crate rocket;
+extern crate rocket_contrib;
 extern crate ws;
 extern crate redis;
 
@@ -15,14 +16,28 @@ mod game;
 mod player;
 mod action;
 
+use rocket_contrib::Template;
+
 use game::{Config, Game, SharedGameState, SharedPlayerList};
 
 use std::env;
 use std::thread;
+use std::collections::HashMap;
 
 #[get("/")]
-fn index() -> &'static str {
-    "Hello, world!"
+fn index() -> Template {
+    let mut context: HashMap<&str, String> = HashMap::new();
+
+    {
+        let host = env::var("WEBSOCKET_HOST").unwrap_or_else(|_| String::from(""));
+        let port = env::var("WEBSOCKET_PORT").unwrap_or_else(|_| String::from(""));
+
+        let websocket_uri = format!("{}:{}", host, port);
+
+        context.insert("websocketUri", websocket_uri);
+    }
+
+    Template::render("index", &context)
 }
 
 fn main() {

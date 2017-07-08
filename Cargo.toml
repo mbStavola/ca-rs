@@ -6,10 +6,10 @@ repository = "https://github.com/mbStavola/ca-rs"
 license = "MIT"
 
 [dependencies]
-rocket = "0.2.7"
-rocket_codegen = "0.2.7"
+rocket = "0.2.8"
+rocket_codegen = "0.2.8"
 
-ws = "0.7.1"
+ws = "0.7.3"
 redis = "0.8.0"
 
 log = "0.3.7"
@@ -18,3 +18,8 @@ serde = "1.0"
 serde_derive = "1.0"
 serde_json = "1.0"
 serde-redis = "0.7.0"
+
+[dependencies.rocket_contrib]
+version = "0.2.8"
+default-features = false
+features = ["handlebars_templates"]
